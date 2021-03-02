@@ -22,6 +22,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import Button from "@material-ui/core/Button";
 import skillProfiles from "../../data/skillProfiles.json";
+import { fetchWrapper } from "../../Services/fetchWrapper";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -283,7 +284,10 @@ export default function SkillProfile() {
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   useEffect(() => {
-    setRows(skillProfiles);
+    fetchWrapper.get("/skill_profiles").then((resp) => {
+      setRows(resp);
+    });
+    // setRows(skillProfiles);
   }, []);
 
   return (
@@ -310,9 +314,9 @@ export default function SkillProfile() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
+                  console.log(`row id`, row._id);
                   const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
                   return (
                     <TableRow
                       hover
@@ -330,15 +334,15 @@ export default function SkillProfile() {
                         />
                       </TableCell>
 
-                      <TableCell>{row.code}</TableCell>
-                      <TableCell>{row.title}</TableCell>
+                      <TableCell>{row.profile_code}</TableCell>
+                      <TableCell>{row.profile_title}</TableCell>
                       <TableCell>
                         <Button
                           variant="outlined"
                           color="primary"
                           size="small"
                           onClick={() => {
-                            navigate(`skill-profiles/${row.id}`);
+                            navigate(`/skill_profiles/u/${row._id}`);
                           }}
                         >
                           View

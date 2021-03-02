@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import PropTypes from "prop-types";
+import PropTypes, { object, string } from "prop-types";
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -21,9 +21,10 @@ import Switch from "@material-ui/core/Switch";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import Button from "@material-ui/core/Button";
-
+import { fetchWrapper } from "../../Services/fetchWrapper";
 import skillGroups from "../../data/skillGroup.json";
 import skills from "../../data/skills.json";
+import { typeOf } from "react-is";
 
 function generateRows() {
   const data = [];
@@ -294,7 +295,10 @@ export default function Skill() {
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   useEffect(() => {
-    setRows(generateRows());
+    fetchWrapper.get("/skill_groups").then((resp) => {
+      setRows(resp);
+    });
+    //setRows(generateRows());
   }, []);
 
   return (
@@ -323,28 +327,56 @@ export default function Skill() {
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      </TableCell>
-                      {Object.keys(row).map(
-                        (r) => r !== "id" && <TableCell>{row[r]}</TableCell>
-                      )}
-                    </TableRow>
-                  );
+                  if (typeof row.skills !== `string`) {
+                    let values = Object.values(row.skills);
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.id)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        selected={isItemSelected}
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={isItemSelected}
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        </TableCell>
+                        <TableCell>{row.group_label}</TableCell>
+                        <TableCell>
+                          {values.map((skill, index) => {
+                            if (values[index + 1] !== undefined) {
+                              return <span>{skill} ,</span>;
+                            } else return <span>{skill} </span>;
+                          })}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  } else {
+                    return (
+                      <TableRow
+                        hover
+                        onClick={(event) => handleClick(event, row.id)}
+                        role="checkbox"
+                        aria-checked={isItemSelected}
+                        tabIndex={-1}
+                        key={row.id}
+                        selected={isItemSelected}
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={isItemSelected}
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        </TableCell>
+                        <TableCell>{row.group_label}</TableCell>
+                        <TableCell>{row.skills}</TableCell>
+                      </TableRow>
+                    );
+                  }
                 })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>

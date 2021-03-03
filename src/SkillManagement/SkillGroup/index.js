@@ -198,9 +198,6 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "50%",
-    },
     marginBottom: theme.spacing(2),
   },
   table: {

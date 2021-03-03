@@ -6,7 +6,8 @@ function checkIsLoggedIn(state, payload) {
     payload.location.pathname.match(/^\/feedback\/b*/g)?.length
   ) {
     return { ...state, isLoggedIn: true };
-  } else return null;
+  }
+  return state;
 }
 
 function reducer(state = initialState, action) {

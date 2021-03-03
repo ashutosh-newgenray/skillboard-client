@@ -22,6 +22,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import Button from "@material-ui/core/Button";
 import skillGroups from "../../data/skillGroup.json";
+import { fetchWrapper } from "../../Services/fetchWrapper";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -279,7 +280,10 @@ export default function SkillGroup() {
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   useEffect(() => {
-    setRows(skillGroups);
+    fetchWrapper.get("/skill_groups").then((resp) => {
+      setRows(resp);
+    });
+    // setRows(skillGroups);
   }, []);
 
   return (
@@ -308,7 +312,7 @@ export default function SkillGroup() {
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
+                  let values = Object.values(row.skills);
                   return (
                     <TableRow
                       hover
@@ -326,7 +330,7 @@ export default function SkillGroup() {
                         />
                       </TableCell>
 
-                      <TableCell>{row.skill_group}</TableCell>
+                      <TableCell>{row.group_label}</TableCell>
                     </TableRow>
                   );
                 })}
